@@ -5,9 +5,9 @@ Get the basic statistics of a FITS image or a region.
 
 This is a very simple program to read the statistics of a full FITS
 image or part of it. A mask can also be specified. If a mask is
-specified, only pixels that are not masked (have a non-zero mask
-value) will be used in the analysis. The histogram and cumulative
-frequency plot of the desired pixels can also be saved. A simple ASCII
+specified, only pixels that are not masked (have a zero mask value) 
+will be used in the analysis. The histogram and cumulative frequency 
+plot of the desired pixels can also be saved. A simple ASCII
 histogram will also be plotted on the standard output for a simple and
 fast comparison before going onto the details.
 
