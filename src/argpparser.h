@@ -255,7 +255,8 @@ static struct argp_option options[] =
       'b',
       "INT",
       0,
-      "["DP_HISTNUMBINS_T"] Number of erosions.\n",
+      "["DP_HISTNUMBINS_T"] Number of bins in the histogram (rows in the "
+      "output text file).\n",
       2
     },
     {

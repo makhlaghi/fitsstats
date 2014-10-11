@@ -9,6 +9,7 @@ src/.deps
 Makefile
 config.h
 config.log
+src/fitsstats
 config.status
 autom4te.cache
 src/runtest.sh

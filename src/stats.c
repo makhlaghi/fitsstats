@@ -299,8 +299,9 @@ setbins(struct fitsstatsparams *p, int h0c1)
   if(p->binonzero)
     {
       for(i=0;i<numbins+1;++i) 
-	if(p->bins[i*2]>0) break;
+	if(p->bins[i*2]>=0.0f) break;
       tosubtract=p->bins[i*2];
+      printf("\n\ntosubtract: %f\n\n", tosubtract);
       for(i=0;i<numbins+1;++i) 
 	p->bins[i*2]-=tosubtract;
     }  
@@ -433,10 +434,10 @@ sigmaclip_converge(struct fitsstatsparams *p)
     {
       oldstart=start;
 
-      med=*(start+numelem/2);
       floatavestd(start, numelem, &ave, &std);
+      med=start[indexfromquantile(numelem, 0.5f)];
        
-      printf("      %lu: (%f, %f, %f, %lu)\n", counter+1, ave, med, 
+      printf("      %lu: (%f, %f, %f, %lu)\n", counter+1, med, ave, 
 	     std, numelem);
 
       /* Normally, oldstd should be larger than std, because the
@@ -488,10 +489,10 @@ sigmaclip_certainnum(struct fitsstatsparams *p)
     {
       oldstart=start;
 
-      med=*(start+numelem/2);
       floatavestd(start, numelem, &ave, &std);
+      med=start[indexfromquantile(numelem, 0.5f)];
        
-      printf("      %lu: (%f, %f, %f, %lu)\n", counter+1, ave, med, 
+      printf("      %lu: (%f, %f, %f, %lu)\n", counter+1, med, ave,
 	     std, numelem);
 
       for(dpt=start; dpt<start+numelem; ++dpt)
