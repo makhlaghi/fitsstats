@@ -391,7 +391,8 @@ static struct argp_option options[] =
       "FLT",
       0,
       "["DP_CONVERGE_T"] In convergence, sigma clipping will halt when "
-      "the change in the standard deviation is below this fraction.\n",
+      "the change in the standard deviation is below this fraction. If it "
+      "converge until "MAXCONVERGE_T" iterations, it will stop.\n",
       4
     }, 
     {

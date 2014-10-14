@@ -163,22 +163,24 @@ floatmaxmasked(float *in, unsigned char *mask, size_t size, float *max)
  *****************         Average and STD       ****************
  ****************************************************************/
 void
-floatavestd(float *data, size_t size, float *ave, float *std)
+floatavestd(float *data, size_t size, float *ave, float *std, 
+	    double *sum)
 {
+  double tave, tsum;
   float *f, *fp;
-  double sum=0.0f, tave;
 
   /* Sum over all the elements to find the average: */
+  *sum=0.0f;
   fp=(f=data)+size;
-  do sum+=*f; while(++f<fp);
-  tave=sum/size;
+  do *sum+=*f; while(++f<fp);
+  tave=*sum/size;
 
   /* Find the differeces, square them, add them and divide by the
      total number to find the standard deviation: */
-  sum=0.0f;
+  tsum=0.0f;
   fp=(f=data)+size;
-  do sum+=(*f-tave)*(*f-tave); while(++f<fp);
-  *std=sqrt(sum/size);
+  do tsum+=(*f-tave)*(*f-tave); while(++f<fp);
+  *std=sqrt(tsum/size);
   *ave=tave;
 }
 
@@ -255,26 +257,28 @@ setbins(struct fitsstatsparams *p, int h0c1)
 {
   float *sorted=p->sorted;
   size_t i, numbins, size=p->size;
-  float tosubtract, *bins, binwidth, min, max;
+  float tosubtract, *bins, binwidth, min, max, quant;
 
   assert(h0c1==0 || h0c1==1);
   if(h0c1==0) 
-    {numbins=p->histnumbins; min=p->histmin; max=p->histmax;}
+    {numbins=p->histnumbins; min=p->histmin; 
+      max=p->histmax; quant=p->histquant;}
   else if(h0c1==1)
-    {numbins=p->cfpnum; min=p->cfpmin; max=p->cfpmax;}
+    {numbins=p->cfpnum; min=p->cfpmin; 
+      max=p->cfpmax; quant=p->cfpquant;}
 
   /* Allocate space for the array. The extra bin is only for internal
      purposes (so the loops for the histogram and CFP can see the end
      of the last bin). It will never be seen by the user. */
-  assert( (p->bins=calloc((numbins+1)*2,sizeof *bins))!=NULL );
+  assert( (bins=p->bins=calloc((numbins+1)*2,sizeof *bins))!=NULL );
 
   /* If the range is not defined, find it and set the bin width. */
   if(min==max)
     {
-      if(p->histquant!=0)
+      if(quant!=0.0f)
 	{
-	  min=sorted[ indexfromquantile(size, p->histquant)   ];
-	  max=sorted[ indexfromquantile(size, 1-p->histquant) ];
+	  min=sorted[ indexfromquantile(size, quant)   ];
+	  max=sorted[ indexfromquantile(size, 1-quant) ];
 	}
       else
 	{
@@ -293,23 +297,22 @@ setbins(struct fitsstatsparams *p, int h0c1)
 
   /* Set all the bin smaller sides: */
   for(i=0;i<numbins+1;++i) 
-    p->bins[i*2]=min+i*binwidth;
+    bins[i*2]=min+i*binwidth;
 
   /* If one bin is to be placed on zero. */
   if(p->binonzero)
     {
       for(i=0;i<numbins+1;++i) 
-	if(p->bins[i*2]>=0.0f) break;
-      tosubtract=p->bins[i*2];
-      printf("\n\ntosubtract: %f\n\n", tosubtract);
+	if(bins[i*2]>=0.0f) break;
+      tosubtract=bins[i*2];
       for(i=0;i<numbins+1;++i) 
-	p->bins[i*2]-=tosubtract;
+	bins[i*2]-=tosubtract;
     }  
 
   /* In case you want to check the bins: */
   if(CHECKBINS)
     for(i=0;i<numbins;++i)
-      printf("%lu: %.4f\n", i+1, p->bins[i*2]);
+      printf("%lu: %.4f\n", i+1, bins[i*2]);
 }
 
 
@@ -424,6 +427,7 @@ cumulativefp(struct fitsstatsparams *p)
 void
 sigmaclip_converge(struct fitsstatsparams *p)
 {
+  double sum;
   size_t counter=0, numelem=p->size;
   float oldstd=0, oldmed=0, oldave=0;
   float med, ave, std, accuracy=p->converge;
@@ -434,7 +438,7 @@ sigmaclip_converge(struct fitsstatsparams *p)
     {
       oldstart=start;
 
-      floatavestd(start, numelem, &ave, &std);
+      floatavestd(start, numelem, &ave, &std, &sum);
       med=start[indexfromquantile(numelem, 0.5f)];
        
       printf("      %lu: (%f, %f, %f, %lu)\n", counter+1, med, ave, 
@@ -466,7 +470,12 @@ sigmaclip_converge(struct fitsstatsparams *p)
       oldave=ave;
       oldmed=med;
       oldstd=std;
-      ++counter;
+
+      if(counter++>=MAXCONVERGE_V-1)
+	{
+	  printf("      ####Convergence not reached!\n");
+	  return;
+	}
     }
 }
 
@@ -480,6 +489,7 @@ sigmaclip_converge(struct fitsstatsparams *p)
 void
 sigmaclip_certainnum(struct fitsstatsparams *p)
 {
+  double sum;
   float *start, *oldstart, *dpt;
   size_t counter=0, numelem=p->size;
   float med, ave, std, sigm=p->sigmultip;
@@ -489,7 +499,7 @@ sigmaclip_certainnum(struct fitsstatsparams *p)
     {
       oldstart=start;
 
-      floatavestd(start, numelem, &ave, &std);
+      floatavestd(start, numelem, &ave, &std, &sum);
       med=start[indexfromquantile(numelem, 0.5f)];
        
       printf("      %lu: (%f, %f, %f, %lu)\n", counter+1, med, ave,

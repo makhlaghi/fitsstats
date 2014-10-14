@@ -526,7 +526,7 @@ applymask(struct fitsstatsparams *p)
 	{
 	  /* In case the pixel is not masked, it will check to see
 	     if the value of the pixel equals the minimum or not. */
-	  *m = m || *f==min;
+	  *m = *m || *f==min;
 	  ++m;
 	}
       while(++f<fp);
@@ -537,10 +537,18 @@ applymask(struct fitsstatsparams *p)
   m=up->mask;
   fp=(f=img)+p->size;
   do 
-    if(m++==0) 
+    if(*m++==0) 
       img[counter++]=*f;
   while(++f<fp);
+
+  /* Report the number of masked pixels: */
+  if(p->verb)
+    printf(" - %lu masked pixels removed.\n", p->size-counter);
+
+  /* Change the size: */
   p->size=counter;
+
+  
   
   free(up->mask);
 }

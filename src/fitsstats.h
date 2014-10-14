@@ -24,8 +24,11 @@ along with FitsStats. If not, see <http://www.gnu.org/licenses/>.
 #define HISTPOSTFIX   "_hist.txt"
 #define CFPPOSTFIX    "_cfp.txt"
 
-#define PRINTINT "%.0f\n"
-#define PRINTFLT "%.6f\n"
+#define PRINTINT      "%.0f\n"
+#define PRINTFLT      "%.6f\n"
+
+#define MAXCONVERGE_T   "30"
+#define MAXCONVERGE_V   30
 
 #define DP_ASCIIHISTNB 60
 #define DP_ASCIIHISTH  10

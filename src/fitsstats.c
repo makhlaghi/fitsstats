@@ -42,14 +42,15 @@ along with FitsStats. If not, see <http://www.gnu.org/licenses/>.
 void
 reportsimplestats(struct fitsstatsparams *p)
 {
+  double sum;
   float ave, std, med;
-  floatavestd(p->img, p->size, &ave, &std);
+  floatavestd(p->img, p->size, &ave, &std, &sum);
   med=p->sorted[indexfromquantile(p->size, 0.5f)];
 
   printf(SNAMEVAL FNAMEVAL FNAMEVAL, "Number of points", p->size, 
 	 "Minimum", p->sorted[0], "Maximum", p->sorted[p->size-1]);
-  printf(FNAMEVAL FNAMEVAL FNAMEVAL, "Mean", ave, "Standard deviation", 
-	 std, "Median", med);
+  printf(FNAMEVAL FNAMEVAL FNAMEVAL FNAMEVAL, "Sum", sum, "Mean", ave, 
+	 "Standard deviation", std, "Median", med);
 }
 
 
@@ -112,14 +113,21 @@ fitsstats(struct fitsstatsparams *p)
 {
   int h0c1;
   size_t i;
+
+  /* Initialize p->bins so there is no problem in the freeing of the
+     end: */
+  p->bins=NULL;
  
   /* Make a sorted array for most of the next jobs: */
   floatarrcpy(p->img, p->size, &p->sorted);
   qsort(p->sorted, p->size, sizeof *p->sorted, floatincreasing);
 
   /* Report the simple statistics: */
-  reportsimplestats(p);
-  printasciihist(p);
+  if(p->verb)
+    {
+      reportsimplestats(p);
+      printasciihist(p);
+    }
 
   /* Make the histogram: */
   if(p->histname)
@@ -150,7 +158,7 @@ fitsstats(struct fitsstatsparams *p)
     }
 
   /* Print out the Sigma clippings: */
-  if(p->sigmaclip)
+  if(p->verb && p->sigmaclip)
     {
       printf(" - %.2f sigma-clipping by convergence (med, mean, "
 	     "std, number):\n", p->sigmultip);
@@ -162,5 +170,5 @@ fitsstats(struct fitsstatsparams *p)
 
   /* Free the allocated arrays: */
   free(p->sorted);
-  free(p->bins);
+  if(p->histname || p->cfpname) free(p->bins);
 }

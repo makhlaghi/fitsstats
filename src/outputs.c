@@ -115,6 +115,7 @@ printhistcfp(struct fitsstatsparams *p, int h0c1)
     for(i=0;i<numbins;++i)
       fprintf(out, "%-20.6f"PRINTFLT, p->bins[i*2]+d, p->bins[i*2+1]);
   fclose(out);
-  printf(" - %s saved in %s (%lu rows)\n", actionname, 
-	 filename, numbins);
+  if(p->verb)
+    printf(" - %s saved in %s (%lu rows)\n", actionname, 
+	   filename, numbins);
 }

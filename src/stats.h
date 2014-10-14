@@ -43,7 +43,8 @@ void
 floatmaxmasked(float *in, unsigned char *mask, size_t size, float *max);
 
 void
-floatavestd(float *data, size_t size, float *ave, float *std);
+floatavestd(float *data, size_t size, float *ave, float *std, 
+	    double *sum);
 
 size_t 
 indexfromquantile(size_t size, float quant);
