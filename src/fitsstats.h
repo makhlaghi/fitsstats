@@ -83,6 +83,7 @@ struct fitsstatsparams
 
   /* Cumulative frequency plot: */
   char       *cfpname;		/* Name of CFP file.                 */
+  int maxcfpeqmaxhist;		/* ==1: as name suggests.            */
   int         normcfp;		/* ==1: Normalize the CFP.           */
   int      cfpsimhist;		/* ==1: Range and num equals hist's. */
   size_t       cfpnum;		/* Number of points for CFP.         */

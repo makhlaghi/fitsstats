@@ -113,6 +113,7 @@ fitsstats(struct fitsstatsparams *p)
 {
   int h0c1;
   size_t i;
+  float maxhist=MINFD;
 
   /* Initialize p->bins so there is no problem in the freeing of the
      end: */
@@ -136,6 +137,11 @@ fitsstats(struct fitsstatsparams *p)
       setbins(p, h0c1);
       histogram(p);
       printhistcfp(p, h0c1);
+
+      if(p->maxcfpeqmaxhist)
+	for(i=0;i<p->histnumbins;++i) 
+	  if(p->bins[i*2+1]>maxhist) 
+	    maxhist=p->bins[i*2+1];
     }
 
   /* Make the cumulative distribution function: */
@@ -154,6 +160,11 @@ fitsstats(struct fitsstatsparams *p)
 	  setbins(p, h0c1);
 	}
       cumulativefp(p);
+
+      if(p->maxcfpeqmaxhist)
+	for(i=0;i<p->cfpnum;++i) 
+	  p->bins[i*2+1]*=(maxhist/p->size); 
+
       printhistcfp(p, h0c1);
     }
 

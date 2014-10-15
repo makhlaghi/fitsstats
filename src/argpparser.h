@@ -89,6 +89,8 @@ const char doc[] =
    a d f j k l o r s v w y z
    C D E F G H I J K L M N O P R S T V V W Z 
 
+   Numbered options are currently <=510.
+
    Options with keys (second structure element) larger than 500 do not
    have a short version.
  */
@@ -316,12 +318,22 @@ static struct argp_option options[] =
       3
     },
     {
+      "maxcfpeqmaxhist",
+      510,
+      0,
+      0,
+      "Set the maximum cumulative frequency plot value to the maximum "
+      "of the histogram. A good option for plotting the CFP and "
+      "Histogram together.\n",
+      3
+    },
+    {
       "cfpsimhist",
       508,
       0,
       0,
       "Use the same settings as the histogram: flux range and number of "
-      "points.\n",
+      "bins to use.\n",
       3
     },
     {
@@ -515,6 +527,9 @@ parse_opt(int key, char *arg, struct argp_state *state)
       break;
     case 508:
       p->cfpsimhist=1;
+      break;
+    case 510:
+      p->maxcfpeqmaxhist=1;
       break;
     case 'p':
       sizetlzero(arg, &p->cfpnum, "cfpnum", key);

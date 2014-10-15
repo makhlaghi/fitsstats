@@ -89,8 +89,8 @@ printhistcfp(struct fitsstatsparams *p, int h0c1)
       actionname="CFP";
       numbins=p->cfpnum;
       filename=p->cfpname;
-      if(p->normcfp) f0i1=0;
-      else           f0i1=1;
+      if(p->normcfp || p->maxcfpeqmaxhist)   f0i1=0;
+      else                                   f0i1=1;
     }
   else 
     {

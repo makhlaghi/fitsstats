@@ -656,17 +656,33 @@ consistencycheck(struct fitsstatsparams *p)
 
   /* Check if a histogram is asked for if the cumulative frequency
      plot is to be using the same parameters: */
-  if(!p->histname && p->cfpname && p->cfpsimhist)
+  if(!p->histname && p->cfpname)
     {
-      fprintf(stderr, PACKAGE": Without a histogram, `--cfpsimhist` is "
-	      "meaningless.\n");
+      if(p->cfpsimhist)
+	fprintf(stderr, PACKAGE": Without a histogram, `--cfpsimhist` is "
+		"meaningless.\n");
+      else if (p->maxcfpeqmaxhist)
+	fprintf(stderr, PACKAGE": Without a histogram, `--maxcfpeqmaxhist` "
+		"is meaningless.\n");
+      else
+	fprintf(stderr, PACKAGE": Impossible condition in "
+		"`consistencycheck()`!");
       exit(EXIT_FAILURE);      
+    }
+
+  /* Check if `--maxcfpeqmaxhist` and `--normcfp` are not called
+     together: */
+  if(p->normcfp && p->maxcfpeqmaxhist)
+    {
+      fprintf(stderr, PACKAGE": `--normcfp` and `--maxcfpeqmaxhist` "
+	      "cannot be called together.\n");
+      exit(EXIT_FAILURE);
     }
 
   /* Check if `normhist` and `maxhistone` are not called together: */
   if(p->normhist && p->maxhistone)
     {
-      fprintf(stderr, PACKAGE": `normhist` and `histnumbins` cannot be "
+      fprintf(stderr, PACKAGE": `--normhist` and `--histnumbins` cannot be "
 	      "called together.\n");
       exit(EXIT_FAILURE);
     }
@@ -718,6 +734,7 @@ setparams(int argc, char *argv[], struct fitsstatsparams *p,
 
   /* Cumulative frequency plot: */
   p->cfpname         = (void *) 1;
+  p->maxcfpeqmaxhist = 0;
   p->normcfp         = 0;
   p->cfpsimhist      = 0;
   p->cfpnum          = DP_CFPNUM_V;
