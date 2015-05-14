@@ -1,6 +1,14 @@
 FitsStats
 =========
 
+FitsStats is discontinued. Its core algorithms are now implemented in 
+ImageStatistics and the other tools in GNU Astronomy Utilities:
+
+https://www.gnu.org/software/gnuastro/
+
+Please visit there for a much better user experience and more accurate
+programs.
+
 Get the basic statistics of a FITS image or a region.
 
 This is a very simple program to read the statistics of a full FITS
